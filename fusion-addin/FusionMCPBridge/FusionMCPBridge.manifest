@@ -1,0 +1,13 @@
+{
+    "autodeskProduct": "Fusion",
+    "type": "addin",
+    "id": "FusionMCPBridge",
+    "author": "Claude Code",
+    "description": {
+        "": "MCP Bridge — exposes Fusion 360 to Claude Code via localhost HTTP"
+    },
+    "version": "1.0.0",
+    "runOnStartup": true,
+    "supportedOS": "mac|windows",
+    "editEnabled": false
+}
