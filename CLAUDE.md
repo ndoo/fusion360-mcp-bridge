@@ -248,6 +248,19 @@ fusion_screenshot(direction="iso-top-right")
 Available directions: `current`, `front`, `back`, `left`, `right`, `top`, `bottom`,
 `iso-top-right`, `iso-top-left`, `iso-bottom-right`, `iso-bottom-left`.
 
+### Saving viewport images from a script
+
+If you ever need to save a viewport image directly from `fusion_execute`, use:
+
+```python
+vp.saveAsImageFile(path, width, height)   # 3 args, returns bool
+```
+
+Do **not** use `vp.saveAsImageFileWithOptions(path, w, h, True)` — on Fusion
+2702.x that method now accepts only the filename and raises
+*"takes 2 positional arguments but 5 were given"*. The add-in was patched
+2026-05-08 to use `saveAsImageFile` instead.
+
 ---
 
 ## Keeping this file up to date
