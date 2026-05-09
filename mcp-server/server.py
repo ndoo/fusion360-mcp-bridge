@@ -11,12 +11,12 @@ Fusion 360 on localhost. Two tools only:
 All knowledge about the Fusion API lives in CLAUDE.md, not here.
 """
 
+import base64
 import os
-import json
 from pathlib import Path
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP, Image
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 FUSION_PORT = int(os.environ.get("FUSION_MCP_PORT", "7654"))
@@ -129,15 +129,15 @@ async def fusion_screenshot(
     direction: str = "current",
     width: int = 1024,
     height: int = 768,
-) -> str:
-    """Capture the active Fusion 360 viewport as a base64-encoded PNG.
+):
+    """Capture the active Fusion 360 viewport as a PNG image.
 
     direction: camera preset — current (default), front, back, left, right,
                top, bottom, iso-top-right, iso-top-left, iso-bottom-right,
                iso-bottom-left
     width/height: output resolution in pixels (default 1024×768)
 
-    Returns a JSON object with keys: screenshot (base64), format, width, height.
+    Returns the rendered image inline as PNG so the caller can see it directly.
     """
     result = await _post("/screenshot", {
         "direction": direction,
@@ -146,7 +146,8 @@ async def fusion_screenshot(
     })
     if "error" in result:
         return f"Error: {result['error']}"
-    return json.dumps(result)
+    raw = base64.b64decode(result["screenshot"])
+    return Image(data=raw, format="png")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
