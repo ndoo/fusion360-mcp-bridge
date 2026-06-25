@@ -270,7 +270,10 @@ def _handle_screenshot(app: adsk.core.Application, body: dict) -> dict:
     tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
     tmp.close()
     try:
-        ok = vp.saveAsImageFileWithOptions(tmp.name, width, height, True)
+        options = adsk.core.SaveImageFileOptions.create(tmp.name)
+        options.width = width
+        options.height = height
+        ok = vp.saveAsImageFileWithOptions(options)
         if not ok:
             return {"error": "Failed to save screenshot"}
         with open(tmp.name, "rb") as f:
