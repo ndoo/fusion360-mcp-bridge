@@ -12,7 +12,6 @@ All knowledge about the Fusion API lives in CLAUDE.md, not here.
 """
 
 import os
-import json
 from pathlib import Path
 
 import httpx
@@ -130,23 +129,26 @@ async def fusion_screenshot(
     width: int = 1024,
     height: int = 768,
 ) -> str:
-    """Capture the active Fusion 360 viewport as a base64-encoded PNG.
+    """Capture the active Fusion 360 viewport and save it as a PNG file.
 
     direction: camera preset — current (default), front, back, left, right,
                top, bottom, iso-top-right, iso-top-left, iso-bottom-right,
                iso-bottom-left
     width/height: output resolution in pixels (default 1024×768)
 
-    Returns a JSON object with keys: screenshot (base64), format, width, height.
+    The bridge writes the PNG to a temp file on the local machine and returns
+    its path (not inline base64, which would blow the token budget). Use the
+    Read tool on the returned path to view the image.
     """
-    result = await _post("/screenshot", {
-        "direction": direction,
-        "width": width,
-        "height": height,
-    })
-    if "error" in result:
-        return f"Error: {result['error']}"
-    return json.dumps(result)
+    result = await _post("/screenshot", {"direction": direction, "width": width, "height": height})
+    if isinstance(result, dict) and result.get("error"):
+        return f"Screenshot failed: {result['error']}"
+    path = result.get("path") if isinstance(result, dict) else None
+    if not path:
+        return f"Unexpected screenshot result: {result}"
+    return (f"Screenshot saved to: {path} ({result.get('width')}x{result.get('height')} px). "
+            f"Use the Read tool on that path to view it (the bridge writes a file instead of "
+            f"returning inline base64, which would blow the token budget).")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

@@ -14,7 +14,7 @@ Claude  ←→  server.py (MCP, stdio)  ←→  HTTP :7654  ←→  FusionMCPBri
 
 Two tools:
 - **`fusion_execute(script)`** — run arbitrary Python inside Fusion's process
-- **`fusion_screenshot(...)`** — capture the active viewport as a base64 PNG
+- **`fusion_screenshot(...)`** — capture the active viewport to a PNG file; returns the saved path (open it with the Read tool)
 
 All geometry work goes through `fusion_execute`. Write scripts that `print()` their results back.
 

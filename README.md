@@ -183,7 +183,7 @@ Or ask Claude: *"Check the Fusion 360 connection status"*
 | Tool | Description |
 |---|---|
 | `fusion_execute` | Run arbitrary Python scripts inside Fusion with full `adsk.*` API access |
-| `fusion_screenshot` | Capture the active viewport as a base64 PNG |
+| `fusion_screenshot` | Capture the active viewport to a PNG file; returns the saved path (open it with the Read tool) |
 
 ### Example prompts
 
