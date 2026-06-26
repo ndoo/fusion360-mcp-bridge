@@ -23,7 +23,6 @@ import uuid
 import sys
 import io
 import os
-import base64
 import tempfile
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
@@ -267,20 +266,22 @@ def _handle_screenshot(app: adsk.core.Application, body: dict) -> dict:
         vp.camera = cam
         vp.refresh()
 
-    tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+    tmp = tempfile.NamedTemporaryFile(prefix="fusion_screenshot_", suffix=".png", delete=False)
     tmp.close()
-    try:
-        ok = vp.saveAsImageFileWithOptions(tmp.name, width, height, True)
-        if not ok:
-            return {"error": "Failed to save screenshot"}
-        with open(tmp.name, "rb") as f:
-            data = base64.b64encode(f.read()).decode()
-        return {"screenshot": data, "format": "png", "width": width, "height": height}
-    finally:
+    options = adsk.core.SaveImageFileOptions.create(tmp.name)
+    options.width = width
+    options.height = height
+    ok = vp.saveAsImageFileWithOptions(options)
+    if not ok:
         try:
             os.unlink(tmp.name)
         except Exception:
             pass
+        return {"error": "Failed to save screenshot"}
+    # Return the file PATH, not inline base64: a base64 PNG in the tool response
+    # blows the MCP client's token budget for anything but tiny images. The client
+    # is local (same machine as Fusion), so it reads the file directly.
+    return {"path": tmp.name, "format": "png", "width": width, "height": height}
 
 
 def _set_camera_direction(cam, direction: str):
